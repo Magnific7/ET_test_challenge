@@ -20,7 +20,7 @@ short_tdl_email = os.getenv('SHORT_TLD')
 
 valid_password = os.getenv('VALID_PASSWORD')
 browser_choice = os.getenv('BROWSER')
-invalid_password = os.getenv('SHORT_PASSWORD')  # Make sure this is set in your .env
+invalid_password = os.getenv('SHORT_PASSWORD')  
 
 LOGIN_URL = 'https://magnific7.github.io/ET_test_challenge/'
 
@@ -35,98 +35,50 @@ class PageLogin(unittest.TestCase):
             raise ValueError("Browser not supported.")
         self.driver.get(LOGIN_URL)
 
-    def test_no_username_email_login(self):
-        # Enter username and email then click on start
+    def login_with_email_and_check_error(self, email, password, should_fail=True):
+
         self.driver.find_element(By.ID, 'candidateName').send_keys(full_name)
         self.driver.find_element(By.ID, 'candidateMail').send_keys(valid_email)
         self.driver.find_element(By.ID, 'startButton').click()
-
-        # Wait a few seconds for navigation and User Story title to appear
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'h3')))
-
-        # Insert the no_username_email and invalid password
-        self.driver.find_element(By.ID, 'email').send_keys(no_username_email)
-        self.driver.find_element(By.ID, 'password').send_keys(invalid_password)
-
-        # Click the login button
+        self.driver.find_element(By.ID, 'email').send_keys(email)
+        self.driver.find_element(By.ID, 'password').send_keys(password)
         self.driver.find_element(By.CSS_SELECTOR, 'input[type="button"][value="Login"]').click()
 
-        # Check for the error message
-        error_message = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'errorMsgMail'))
-        ).text
-        self.assertIn("Invalid email", error_message, "Error message for invalid email not found")
+        if should_fail:
+            error_message = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.ID, 'errorMsgMail'))
+            ).text
+            self.assertIn("Invalid email", error_message, "Error message for invalid email not found")
+        else:
+            try:
+                WebDriverWait(self.driver, 10).until_not(
+                    EC.text_to_be_present_in_element((By.ID, 'errorMsgMail'), "Invalid email")
+                )
+                login_success = True
+            except TimeoutException:
+                login_success = False
+
+            self.assertTrue(login_success, "Expected absence of 'Invalid email' error message, but it was found.")
+
+    def test_no_username_email_login(self):
+        self.login_with_email_and_check_error(no_username_email, invalid_password)
 
     def test_no_dot_email_login(self):
-        # Enter username and email then click on start
-        self.driver.find_element(By.ID, 'candidateName').send_keys(full_name)
-        self.driver.find_element(By.ID, 'candidateMail').send_keys(valid_email)
-        self.driver.find_element(By.ID, 'startButton').click()
-
-        # Wait a few seconds for navigation and User Story title to appear
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'h3')))
-
-        # Insert the no_username_email and invalid password
-        self.driver.find_element(By.ID, 'email').send_keys(no_dot_email)
-        self.driver.find_element(By.ID, 'password').send_keys(invalid_password)
-
-        # Click the login button
-        self.driver.find_element(By.CSS_SELECTOR, 'input[type="button"][value="Login"]').click()
-
-        # Check for the error message
-        error_message = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'errorMsgMail'))
-        ).text
-        self.assertIn("Invalid email", error_message, "Error message for invalid email not found")
+        self.login_with_email_and_check_error(no_dot_email, invalid_password)
 
     def test_short_domain_email_login(self):
-        # Enter username and email then click on start
-        self.driver.find_element(By.ID, 'candidateName').send_keys(full_name)
-        self.driver.find_element(By.ID, 'candidateMail').send_keys(valid_email)
-        self.driver.find_element(By.ID, 'startButton').click()
-
-        # Wait a few seconds for navigation and User Story title to appear
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'h3')))
-
-        # Insert the no_username_email and invalid password
-        self.driver.find_element(By.ID, 'email').send_keys(short_domain_email)
-        self.driver.find_element(By.ID, 'password').send_keys(invalid_password)
-
-        # Click the login button
-        self.driver.find_element(By.CSS_SELECTOR, 'input[type="button"][value="Login"]').click()
-
-        # Check for the error message
-        error_message = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'errorMsgMail'))
-        ).text
-        self.assertIn("Invalid email", error_message, "Error message for invalid email not found")
+        self.login_with_email_and_check_error(short_domain_email, invalid_password)
 
     def test_short_tdl_email_login(self):
-        # Enter username and email then click on start
-        self.driver.find_element(By.ID, 'candidateName').send_keys(full_name)
-        self.driver.find_element(By.ID, 'candidateMail').send_keys(valid_email)
-        self.driver.find_element(By.ID, 'startButton').click()
+        self.login_with_email_and_check_error(short_tdl_email, invalid_password)
 
-        # Wait a few seconds for navigation and User Story title to appear
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'h3')))
-
-        # Insert the no_username_email and invalid password
-        self.driver.find_element(By.ID, 'email').send_keys(short_tdl_email)
-        self.driver.find_element(By.ID, 'password').send_keys(invalid_password)
-
-        # Click the login button
-        self.driver.find_element(By.CSS_SELECTOR, 'input[type="button"][value="Login"]').click()
-
-        # Check for the error message
-        error_message = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, 'errorMsgMail'))
-        ).text
-        self.assertIn("Invalid email", error_message, "Error message for invalid email not found")
-
-    
+    def test_valid_email_and_password(self):
+        self.login_with_email_and_check_error(valid_email, valid_password, should_fail=False)
 
     def tearDown(self):
         self.driver.quit()
+
 
 if __name__ == '__main__':
     unittest.main()

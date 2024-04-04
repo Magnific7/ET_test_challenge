@@ -48,15 +48,9 @@ Activate the virtual environment:
 
 ### Run the tests 
 
-#### Email Tests
-Run the following command to execute the email validation tests:
-`python email_test.py`
+`python exec.py`
 
-#### Password Tests
-Execute the password validation tests with:
-`python password_test.py`
-
-Both scripts will launch the browser multiple times to test different scenarios as specified in the challenge requirements. Ensure your browser driver (ChromeDriver or geckodriver) is correctly installed and accessible in your system's PATH to avoid any issues with launching the browser.
+This will launch the browser multiple times to test different scenarios as specified in the challenge requirements. Ensure your browser driver (ChromeDriver or geckodriver) is correctly installed and accessible in your system's PATH to avoid any issues with launching the browser.
 
 
   
